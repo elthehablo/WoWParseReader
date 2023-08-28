@@ -1,0 +1,18 @@
+# TrinityCore - WowPacketParser
+# File name: testfile.pkt
+# Detected build: V2_5_4_43861
+# Detected locale: enUS
+# Targeted database: WrathOfTheLichKing
+# Parsing date: 09/21/2022 04:06:43
+
+ServerToClient: SMSG_AUTH_CHALLENGE (0x3048) Length: 49 ConnIdx: 0 Time: 09/21/2022 04:06:43.213 Number: 0
+[0] DosChallenge: 2481445220
+[1] DosChallenge: 3156722384
+[2] DosChallenge: 3778262696
+[3] DosChallenge: 1624696168
+[4] DosChallenge: 3550709730
+[5] DosChallenge: 3745246639
+[6] DosChallenge: 4245059907
+[7] DosChallenge: 4197284355
+Challenge: 7526EA3CAE54BB5876AEA8FC3A1EF6BB
+DosZeroBits: 1
