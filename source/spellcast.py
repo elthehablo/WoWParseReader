@@ -8,8 +8,12 @@ class SpellCastCalculator:
     
     def __init__(self, list_dict_spell_timer: List[Dict[str, Any]]):
         self.list_dict_spell_timer = list_dict_spell_timer
+        self.calculated_spell_times = []
     
     def compute_timers(self):
+        '''
+        computes the spellcast initial and repeat values for 
+        '''
         final_list_dict = []
         spell_entries = get_all_spell_entries(self.list_dict_spell_timer)
         timestamp_format = "%H:%M:%S.%f"
@@ -54,7 +58,50 @@ class SpellCastCalculator:
                         counter += 1
                         if counter == len(self.list_dict_spell_timer):
                             break #before we check out of bounds
-        return final_list_dict
+        self.calculated_spell_times = final_list_dict
+    
+    def compute_final_times(self):
+        spell_entries = get_all_spell_entries(self.list_dict_spell_timer)
+        guid_list = get_all_guids(self.list_dict_spell_timer)
+        final_dict = {}
+        current_initial_timer_list = {}
+        current_repeat_timer_list = {}
+        for spell_entry in spell_entries:
+            final_dict = final_dict | {spell_entry: {
+                'initial_min_time': "",
+                'initial_avg_time': "",
+                'initial_max_time': "",
+                'repeat_min_time': "",
+                'repeat_avg_time': "",
+                'repeat_max_time': "",
+            }}
+            current_initial_timer_list[spell_entry] = []
+            current_repeat_timer_list[spell_entry] = []
+            
+        for calc_item in self.calculated_spell_times:
+            for spell_entry in spell_entries:
+                
+                for guid in guid_list:
+                    if calc_item.get('spell_id', "") == spell_entry \
+                        and calc_item.get('casterGUID', "") == guid:
+                        if calc_item.get('timedeltaInitialCast', ""):
+                            current_initial_timer_list[spell_entry].append(float(calc_item['timedeltaInitialCast']))
+                        elif calc_item.get('timebetweenlastcast', ""):
+                            current_repeat_timer_list[spell_entry].append(float(calc_item['timebetweenlastcast']))
+        for spell_entry in spell_entries:
+            current_initial_min_value = min(current_initial_timer_list[spell_entry])
+            current_initial_avg_value = sum(current_initial_timer_list[spell_entry])/len(current_initial_timer_list[spell_entry])
+            current_initial_max_value = current_initial_min_value + 2*(current_initial_avg_value-current_initial_min_value)
+            current_repeat_min_value = min(current_repeat_timer_list[spell_entry])
+            current_repeat_avg_value = sum(current_repeat_timer_list[spell_entry])/len(current_repeat_timer_list[spell_entry])
+            current_repeat_max_value = current_repeat_min_value + 2*(current_repeat_avg_value-current_repeat_min_value)
+            final_dict[spell_entry]['initial_min_time'] = current_initial_min_value
+            final_dict[spell_entry]['initial_avg_time'] = current_initial_avg_value
+            final_dict[spell_entry]['initial_max_time'] = current_initial_max_value
+            final_dict[spell_entry]['repeat_min_time'] = current_repeat_min_value
+            final_dict[spell_entry]['repeat_avg_time'] = current_repeat_avg_value
+            final_dict[spell_entry]['repeat_max_time'] = current_repeat_max_value
+        return final_dict
 
 def get_all_spell_entries(dict_to_check: List[Dict[str, Any]]):
     spell_entry_list = []
@@ -63,3 +110,11 @@ def get_all_spell_entries(dict_to_check: List[Dict[str, Any]]):
         if spell_id and spell_id not in spell_entry_list:
             spell_entry_list.append(spell_id) 
     return spell_entry_list
+
+def get_all_guids(dict_to_check: List[Dict[str, Any]]):
+    guid_list = []
+    for item in dict_to_check:
+        guid = item.get('casterGUID', "")
+        if guid and guid not in guid_list:
+            guid_list.append(guid)
+    return guid_list

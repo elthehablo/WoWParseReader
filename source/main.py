@@ -15,6 +15,8 @@ def main():
         
         spell_cast_calculator.compute_timers()
         
+        spell_cast_calculator.compute_final_times()
+        
         
         print(all_spells) 
         return
