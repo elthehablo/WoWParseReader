@@ -1,6 +1,7 @@
 from importer import Importer
 from parseExtractor import ParseExtractor
 from spellcast import SpellCastCalculator
+import json
 
 def main():
         #path = "source/to_read_files/"+input("enter filename (<filename>.txt): ")
@@ -15,10 +16,16 @@ def main():
         
         spell_cast_calculator.compute_timers()
         
-        spell_cast_calculator.compute_final_times()
+        final_timers = spell_cast_calculator.compute_final_times()
+        #jsons
+        print("all timers:")
+        timers_json = json.dumps(spell_cast_calculator.calculated_spell_times, indent=8)
+        print(timers_json)
         
-        
-        print(all_spells) 
+        print("")
+        print("calculated spell timers:")
+        calculated_timers_json = json.dumps(final_timers, indent = 8)
+        print(calculated_timers_json)
         return
     
 if __name__ == "__main__":
