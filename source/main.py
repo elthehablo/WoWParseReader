@@ -1,5 +1,6 @@
 from importer import Importer
 from parseExtractor import ParseExtractor
+from spellcast import SpellCastCalculator
 
 def main():
         #path = "source/to_read_files/"+input("enter filename (<filename>.txt): ")
@@ -9,6 +10,10 @@ def main():
         imported.import_parse()
         
         all_spells = ParseExtractor.extract_all_spells_for_entry(17339, imported.filecontents)
+        
+        spell_cast_calculator = SpellCastCalculator(all_spells)
+        
+        spell_cast_calculator.compute_timers()
         
         
         print(all_spells) 

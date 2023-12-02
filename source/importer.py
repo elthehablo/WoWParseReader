@@ -1,7 +1,3 @@
-import numpy as np
-
-import parseExtractor
-
 class Importer:
     '''
     class that allows the importing of parsed txt files

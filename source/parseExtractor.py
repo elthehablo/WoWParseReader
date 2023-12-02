@@ -1,5 +1,4 @@
 from typing import Dict, List, Any
-import numpy as np
 from re import search
 
 class ParseExtractor:
