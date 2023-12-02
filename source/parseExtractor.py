@@ -1,4 +1,5 @@
 import numpy as np
+from re import search
 
 class ParseExtractor:
     '''
@@ -6,37 +7,25 @@ class ParseExtractor:
     '''
     
     @staticmethod
-    def extract_version(toParseData):
+    def extract_version(to_parse_data: str):
         '''
         extracts version and returns it as a string
         '''
-        assert(type(toParseData) == str), "parsed file does not have correctly typed data"
+        assert(type(to_parse_data) == str), "parsed file does not have correctly typed data"
         
-        N = np.size(toParseData)
+        version_string = search(r'Detected build: (.*?)#', to_parse_data)
         
-        lineVersion = 0
+        real_version_string = version_string.group(0)
+    
         
-        for i in range(N):
-            if("# Detected build" in toParseData[i]):
-                lineVersion = i
-                break
-        
-        if(lineVersion == 0):
-            print("error: version not found")
-            return
-        
-        versionString = ""
-        
-        limit = 1000 #sets initial limit at an unreachable position
-        
-        for i in range(np.size(toParseData[lineVersion])):
-            if (i > limit):
-                versionString += toParseData[lineVersion][i] #if i is beyond the limit, which is at the initial V, it adds it
-            if (toParseData[lineVersion][i] == "V"):
-                versionString += "V"
-                limit = i
-        
-        return versionString
+        return real_version_string
+    
+    @staticmethod
+    def extract_all_spells_for_entry(entry: int):
+        '''
+        extracts all the spells, with a creature guid and entry at the timestamp
+        '''
+        return
             
 
         

@@ -14,26 +14,10 @@ class Importer:
         '''
         imports a parse and stores into into a string array using newline as a delimiter as a delimiter, also returns a separate arraylist with the filename and other info in it
         '''
-        metaData = np.array([self.filename])
-        
-        fullData = open(self.filename, 'r')
-        
-        fullData.readlines()
-        
-        fullData.close()
-        
-        print(fullData)
-        
-        fullData = np.array(fullData)
-        print(type(fullData[0]))
-        
-        size = np.size(fullData)
-        
-        version = parseExtractor.ParseExtractor.extract_version(fullData)
-        
-        metaData = np.append(metaData, np.array([size, version]))
-        
-        return metaData, fullData
+        with open(self.filename) as file:
+            full_data = file.read().replace('\n',' ')
+            
+        return full_data
         
         
         
