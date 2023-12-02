@@ -9,15 +9,17 @@ class Importer:
     
     def __init__(self, filename):
         self.filename = filename
+        self.filecontents = []
         
-    def import_parse(self):
+    def import_parse(self) -> None:
         '''
         imports a parse and stores into into a string array using newline as a delimiter as a delimiter, also returns a separate arraylist with the filename and other info in it
         '''
         with open(self.filename) as file:
-            full_data = file.read().replace('\n',' ')
+            full_data = file.read()
             
-        return full_data
+        line_list = full_data.split('\n')
+        self.filecontents = line_list
         
         
         
