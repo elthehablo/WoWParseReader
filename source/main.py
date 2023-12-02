@@ -2,7 +2,8 @@ from importer import Importer
 from parseExtractor import ParseExtractor
 
 def main():
-        path = "source/to_read_files/"+input("enter filename (<filename>.txt): ")
+        #path = "source/to_read_files/"+input("enter filename (<filename>.txt): ")
+        path = "source/to_read_files/felsworn.txt" # for testing
         imported = Importer(path)
         
         imported.import_parse()
