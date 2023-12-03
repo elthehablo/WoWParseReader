@@ -12,7 +12,7 @@ def main():
         
         imported.import_parse()
         
-        choice = input("what action do you want? [spells/wander] ")
+        choice = input("what action do you want? [spells/wander/waypoints] ")
         
         match choice:
                 case "spells":
@@ -39,6 +39,12 @@ def main():
                         print("average wander movements:")
                         wander_movements = json.dumps(avg_wander_movement, indent = 8)
                         print(wander_movements)
+                        return
+                case "waypoints":
+                        waypoints = ParseExtractor.gather_all_waypoints(npc_entry, imported.filecontents)
+                        name = input("Enter name for waypoint comment: ")
+                        ParseExtractor.print_waypoints_as_sql_insert(npc_entry, name, waypoints)
+                        return
                 case _:
                         return
     

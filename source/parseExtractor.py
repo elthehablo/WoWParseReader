@@ -97,6 +97,12 @@ class ParseExtractor:
     
     @staticmethod
     def find_average_wander_distance(entry: int, content_to_parse: List[str], spawn_location: List[float]) -> Dict[str, Any]:
+        '''
+        finds the wander details of a creature, such as:
+        - max wandering distance
+        - average wandering distance
+        - amount of movement updates
+        '''
         x_distance_list = []
         y_distance_list = []
         movement_updates = 0
@@ -136,7 +142,63 @@ class ParseExtractor:
     
     @staticmethod
     def gather_all_waypoints(entry: int, content_to_parse: List[str]):
-        return
+        true_waypoints = []
+        additional_waypoints = []
+        for idx, line in enumerate(content_to_parse):
+            if search(r'ServerToClient: SMSG_ON_MONSTER_MOVE', line):
+                entry_check = search(r'Entry: (.*?)Low:', content_to_parse[idx+1])
+                if entry_check:
+                    true_entry = int(entry_check.group(0).split(' ')[1])
+                    if true_entry == entry:
+                        from_search_line = idx
+                        while not search(r' Points:', content_to_parse[from_search_line]):
+                            from_search_line += 1
+                        coords = search(r'X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+)', content_to_parse[from_search_line])
+                        current_coords_list = []
+                        if coords:
+                            grouped_list = coords.group(0).split(' ')
+                            for i in range(len(grouped_list)):
+                                if i%2 != 0:
+                                    current_coords_list.append(float(grouped_list[i]))
+                        if current_coords_list not in true_waypoints:
+                            true_waypoints.append(current_coords_list)
+                        additional_waypoint_counter = from_search_line+1
+                        while search(r' WayPoints:', content_to_parse[additional_waypoint_counter]):
+                            coords = search(r'X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+)', content_to_parse[additional_waypoint_counter])
+                            current_coords_list = []
+                            if coords:
+                                grouped_list = coords.group(0).split(' ')
+                                for i in range(len(grouped_list)):
+                                    if i%2 != 0:
+                                        current_coords_list.append(float(grouped_list[i]))
+                            if current_coords_list not in additional_waypoints:
+                                additional_waypoints.append(current_coords_list)
+                            additional_waypoint_counter += 1
+        return true_waypoints
+    
+    @staticmethod
+    def print_waypoints_as_sql_insert(entry: int, name: str, waypoint_list: List[float]) -> None:
+        f = open(f"{name}.sql", "w")
+        delete_line = f"DELETE FROM `waypoints` WHERE `entry` = {entry}"
+        insert_preamble = "INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES"
+        print(delete_line)
+        print(insert_preamble)
+        f.write(f"{delete_line}\n")
+        f.write(f"{insert_preamble}\n")
+        point_id = 1
+        
+        cleaned_waypoint_list = [sub_list for sub_list in waypoint_list if sub_list != []]
+        
+        for waypoint in cleaned_waypoint_list:
+            if waypoint:
+                print_line = f"({entry}, {point_id}, {waypoint[0]}, {waypoint[1]}, {waypoint[2]}, NULL, 0, {name})"
+                print_line = f"{print_line};" if point_id == len(cleaned_waypoint_list) else f"{print_line}," 
+                print(print_line)
+                f.write(f"{print_line}\n")
+                point_id += 1
+        f.close()
+        
+                        
         
         
         
