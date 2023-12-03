@@ -17,13 +17,20 @@ class SpellCastCalculator:
         final_list_dict = []
         spell_entries = get_all_spell_entries(self.list_dict_spell_timer)
         timestamp_format = "%H:%M:%S.%f"
+        breakcondition = False #break on no repeating
         for idx, item in enumerate(self.list_dict_spell_timer):
             if item.get('attackStartTime', ""):
                 combat_start_datetime = datetime.strptime(item['attackStartTime'], timestamp_format)
-                for spell_entry in spell_entries:
+                for spell_entry in spell_entries:    
                     counter = idx+1
                     while self.list_dict_spell_timer[counter].get('spell_id', "") != spell_entry:
                         counter+=1
+                        if counter == len(self.list_dict_spell_timer):
+                            #happens when no repeat found
+                            breakcondition = True
+                            break
+                    if breakcondition:
+                        continue
                     initial_spell_cast_timestamp = datetime.strptime(
                         self.list_dict_spell_timer[counter]['timestamp'], timestamp_format
                     )
@@ -37,12 +44,12 @@ class SpellCastCalculator:
                     final_list_dict.append(dict)
                     #now we want all consecutive spells
                     current_spell_cast_timestamp = initial_spell_cast_timestamp
-                    counter += 1
+                    cast_counter = counter + 1
                     castno = 1
-                    while self.list_dict_spell_timer[counter].get('timestamp', ""):
-                        if (self.list_dict_spell_timer[counter].get('spell_id') == spell_entry):
+                    while self.list_dict_spell_timer[cast_counter].get('timestamp', ""):
+                        if (self.list_dict_spell_timer[cast_counter].get('spell_id') == spell_entry):
                             new_timestamp = datetime.strptime(
-                                self.list_dict_spell_timer[counter]['timestamp'], timestamp_format
+                                self.list_dict_spell_timer[cast_counter]['timestamp'], timestamp_format
                             )
                             timedelta = new_timestamp - current_spell_cast_timestamp
                             current_spell_cast_timestamp = new_timestamp #new value to check from comes the new entry point
@@ -55,8 +62,8 @@ class SpellCastCalculator:
                             }
                             final_list_dict.append(dict)
                             castno += 1
-                        counter += 1
-                        if counter == len(self.list_dict_spell_timer):
+                        cast_counter += 1
+                        if cast_counter == len(self.list_dict_spell_timer):
                             break #before we check out of bounds
         self.calculated_spell_times = final_list_dict
     
@@ -77,7 +84,6 @@ class SpellCastCalculator:
             }}
             current_initial_timer_list[spell_entry] = []
             current_repeat_timer_list[spell_entry] = []
-            
         for calc_item in self.calculated_spell_times:
             for spell_entry in spell_entries:
                 
@@ -88,6 +94,7 @@ class SpellCastCalculator:
                             current_initial_timer_list[spell_entry].append(float(calc_item['timedeltaInitialCast']))
                         elif calc_item.get('timebetweenlastcast', ""):
                             current_repeat_timer_list[spell_entry].append(float(calc_item['timebetweenlastcast']))
+        current_repeat_timer_list = fill_empty_repeat_lists(current_repeat_timer_list)
         for spell_entry in spell_entries:
             current_initial_min_value = min(current_initial_timer_list[spell_entry])
             current_initial_avg_value = sum(current_initial_timer_list[spell_entry])/len(current_initial_timer_list[spell_entry])
@@ -118,3 +125,13 @@ def get_all_guids(dict_to_check: List[Dict[str, Any]]):
         if guid and guid not in guid_list:
             guid_list.append(guid)
     return guid_list
+
+def fill_empty_repeat_lists(dict_list_to_check):
+    '''
+    adds a 0 to an empty repeat list so that the average calculations don't break
+    '''
+
+    for dict_item in dict_list_to_check:
+        if len(dict_list_to_check[dict_item]) == 0:
+            dict_list_to_check[dict_item] = [0]
+    return dict_list_to_check
