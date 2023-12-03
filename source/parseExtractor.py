@@ -179,7 +179,8 @@ class ParseExtractor:
     @staticmethod
     def print_waypoints_as_sql_insert(entry: int, name: str, waypoint_list: List[float]) -> None:
         f = open(f"{name}.sql", "w")
-        delete_line = f"DELETE FROM `waypoints` WHERE `entry` = {entry};"
+        wp_entry = entry*100
+        delete_line = f"DELETE FROM `waypoints` WHERE `entry` = {wp_entry};"
         insert_preamble = "INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES"
         print(delete_line)
         print(insert_preamble)
@@ -191,7 +192,7 @@ class ParseExtractor:
         
         for waypoint in cleaned_waypoint_list:
             if waypoint:
-                print_line = f"({entry}, {point_id}, {waypoint[0]}, {waypoint[1]}, {waypoint[2]}, NULL, 0, '{name}')"
+                print_line = f"({wp_entry}, {point_id}, {waypoint[0]}, {waypoint[1]}, {waypoint[2]}, NULL, 0, '{name}')"
                 print_line = f"{print_line};" if point_id == len(cleaned_waypoint_list) else f"{print_line}," 
                 print(print_line)
                 f.write(f"{print_line}\n")
