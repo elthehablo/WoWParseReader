@@ -1,5 +1,6 @@
 from typing import Dict, List, Any
 from re import search
+import math
 
 class ParseExtractor:
     '''
@@ -62,6 +63,83 @@ class ParseExtractor:
                         spell_data_list.append(dict_to_put_in_list)
                         count += 1
         return spell_data_list
+    
+    @staticmethod
+    def find_spawn_location_by_entry(entry: int, content_to_parse: List[str]) -> List[float]:
+        possible_spawn_locations = []
+        for idx, line in enumerate(content_to_parse):
+            if search(r'Object Guid: Full: (.*?)Creature', line):
+                entry_check = search(r'Entry: (.*?)Low:', line)
+                if entry_check:
+                    true_entry = int(entry_check.group(0).split(' ')[1])
+                    if true_entry == entry:
+                        coords_posis = idx+25
+                        orientation_posis = idx+26
+                        coords_line = content_to_parse[coords_posis]
+                        orientation_line = content_to_parse[orientation_posis]
+                        coords = search(r'X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+)', coords_line)
+                        orientation = search(r'Orientation: (-?\d+\.\d+)', orientation_line)
+                        coords_orientation_list = []
+                        if coords:
+                            grouped_list = coords.group(0).split(' ')
+                            for i in range(len(grouped_list)):
+                                if i%2 != 0:
+                                    coords_orientation_list.append(float(grouped_list[i]))
+                        else:
+                            coords_orientation_list = [0.0, 0.0, 0.0]
+                        if orientation:
+                            grouped_list = orientation.group(0).split(' ')
+                            coords_orientation_list.append(float(grouped_list[1]))
+                        else:
+                            coords_orientation_list.append(0.0)
+                        possible_spawn_locations.append(coords_orientation_list)
+        return possible_spawn_locations
+    
+    @staticmethod
+    def find_average_wander_distance(entry: int, content_to_parse: List[str], spawn_location: List[float]) -> Dict[str, Any]:
+        x_distance_list = []
+        y_distance_list = []
+        movement_updates = 0
+        for idx, line in enumerate(content_to_parse):
+            if search(r'ServerToClient: SMSG_ON_MONSTER_MOVE', line):
+                entry_check = search(r'Entry: (.*?)Low:', content_to_parse[idx+1])
+                if entry_check:
+                    true_entry = int(entry_check.group(0).split(' ')[1])
+                    if true_entry == entry:
+                        coords = search(r'X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+)', content_to_parse[idx+2])
+                        current_coords_list = []
+                        if coords:
+                            grouped_list = coords.group(0).split(' ')
+                            for i in range(len(grouped_list)):
+                                if i%2 != 0:
+                                    current_coords_list.append(float(grouped_list[i]))
+                        x_dist = abs(spawn_location[0]-current_coords_list[0])
+                        y_dist = abs(spawn_location[1]-current_coords_list[1])
+                        x_distance_list.append(x_dist)
+                        y_distance_list.append(y_dist)
+                        movement_updates += 1
+        avg_x = sum(x_distance_list)/len(x_distance_list)
+        avg_y = sum(y_distance_list)/len(y_distance_list)
+        max_x = max(x_distance_list)
+        max_y = max(y_distance_list)
+        max_distance_from_spawn = math.sqrt(math.pow(max_x, 2)+math.pow(max_y, 2))
+        dict_to_return = {
+            'spawn_location': f"X: {spawn_location[0]} Y: {spawn_location[1]} Z: {spawn_location[2]} O: {spawn_location[3]}",
+            'avg_x_wander': avg_x,
+            'avg_y_wander': avg_y,
+            'max_x_wander': max_x,
+            'max_y_wander': max_y,
+            'max_distance_from_spawn': max_distance_from_spawn,
+            'no_recorded_movement_updates': movement_updates
+        }
+        return dict_to_return
+    
+    @staticmethod
+    def gather_all_waypoints(entry: int, content_to_parse: List[str]):
+        return
+        
+        
+        
 
 def check_for_entry(data_to_check: List[str], current_id: int):
     return search(r'Entry: (.*?)Low:', data_to_check[current_id+1])

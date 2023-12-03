@@ -12,23 +12,35 @@ def main():
         
         imported.import_parse()
         
-        all_spells = ParseExtractor.extract_all_spells_for_entry(npc_entry, imported.filecontents)
+        choice = input("what action do you want? [spells/wander] ")
         
-        spell_cast_calculator = SpellCastCalculator(all_spells)
-        
-        spell_cast_calculator.compute_timers()
-        
-        final_timers = spell_cast_calculator.compute_final_times()
-        #jsons
-        print("all timers:")
-        timers_json = json.dumps(spell_cast_calculator.calculated_spell_times, indent=8)
-        print(timers_json)
-        
-        print("")
-        print("calculated spell timers:")
-        calculated_timers_json = json.dumps(final_timers, indent = 8)
-        print(calculated_timers_json)
-        return
+        match choice:
+                case "spells":
+                        all_spells = ParseExtractor.extract_all_spells_for_entry(npc_entry, imported.filecontents)
+                        
+                        spell_cast_calculator = SpellCastCalculator(all_spells)
+                        
+                        spell_cast_calculator.compute_timers()
+                        
+                        final_timers = spell_cast_calculator.compute_final_times()
+                        #jsons
+                        print("all timers:")
+                        timers_json = json.dumps(spell_cast_calculator.calculated_spell_times, indent=8)
+                        print(timers_json)
+                        
+                        print("")
+                        print("calculated spell timers:")
+                        calculated_timers_json = json.dumps(final_timers, indent = 8)
+                        print(calculated_timers_json)
+                        return
+                case "wander":
+                        spawn_locations = ParseExtractor.find_spawn_location_by_entry(npc_entry, imported.filecontents)
+                        avg_wander_movement = ParseExtractor.find_average_wander_distance(npc_entry, imported.filecontents, spawn_locations[0])
+                        print("average wander movements:")
+                        wander_movements = json.dumps(avg_wander_movement, indent = 8)
+                        print(wander_movements)
+                case _:
+                        return
     
 if __name__ == "__main__":
     main()
