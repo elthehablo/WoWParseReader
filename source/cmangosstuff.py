@@ -40,7 +40,7 @@ class CManGOS:
         f = open(f"{name_to_give}.sql", "w")
         entries = dict_list_to_inspect.get("creature_entry", [0])
         entry_string = f"({', '.join(entries)})"
-        delete_line = f"DELETE FROM `creature_loot_template` WHERE `Entry` IN {entry_string};"
+        delete_line = f"DELETE FROM `creature_loot_template` WHERE `Entry` IN {entry_string} AND `Item` = {item};"
         insert_preamble = "INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES"
         print(delete_line)
         print(insert_preamble)
