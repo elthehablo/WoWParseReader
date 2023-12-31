@@ -1,18 +1,19 @@
 from importer import Importer
 from parseExtractor import ParseExtractor
 from spellcast import SpellCastCalculator
+from cmangosstuff import CManGOS
 import json
 
 def main():
         path = "source/to_read_files/"+input("enter filename (<filename>.txt): ")
-        #path = "source/to_read_files/felsworn.txt" # for testing
+        #path = "source/to_read_files/potion.txt" # for testing
         imported = Importer(path)
         
         npc_entry = int(input("enter entry id: "))
         
         imported.import_parse()
-        
-        choice = input("what action do you want? [spells/wander/waypoints] ")
+              
+        choice = input("what action do you want? [spells/wander/waypoints/cmangostabletoinsert] ")
         
         match choice:
                 case "spells":
@@ -44,6 +45,11 @@ def main():
                         waypoints = ParseExtractor.gather_all_waypoints(npc_entry, imported.filecontents)
                         name = input("Enter name for waypoint comment: ")
                         ParseExtractor.print_waypoints_as_sql_insert(npc_entry, name, waypoints)
+                        return
+                case "cmangostabletoinsert":
+                        table_of_data = CManGOS.parse_cmangos_loot_to_list_dict(imported.filecontents)
+                        item_name = input(f"Name of item corresponding to id {npc_entry}: ")
+                        CManGOS.dict_list_to_ref_loot_insert(table_of_data, "test", npc_entry, item_name)
                         return
                 case _:
                         return
