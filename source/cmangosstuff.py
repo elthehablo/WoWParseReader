@@ -38,7 +38,7 @@ class CManGOS:
     @staticmethod
     def dict_list_to_ref_loot_insert(dict_list_to_inspect, name_to_give: str, item: int, item_name: str):
         f = open(f"{name_to_give}.sql", "w")
-        entries = dict_list_to_inspect.get("entry", [0])
+        entries = dict_list_to_inspect.get("creature_entry", [0])
         entry_string = f"({', '.join(entries)})"
         delete_line = f"DELETE FROM `creature_loot_template` WHERE `Entry` IN {entry_string};"
         insert_preamble = "INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES"
