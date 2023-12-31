@@ -160,8 +160,7 @@ class ParseExtractor:
                             for i in range(len(grouped_list)):
                                 if i%2 != 0:
                                     current_coords_list.append(float(grouped_list[i]))
-                        if current_coords_list not in true_waypoints:
-                            true_waypoints.append(current_coords_list)
+                        true_waypoints.append(current_coords_list)
                         additional_waypoint_counter = from_search_line+1
                         while search(r' WayPoints:', content_to_parse[additional_waypoint_counter]):
                             coords = search(r'X: (-?\d+\.\d+) Y: (-?\d+\.\d+) Z: (-?\d+\.\d+)', content_to_parse[additional_waypoint_counter])
@@ -171,8 +170,7 @@ class ParseExtractor:
                                 for i in range(len(grouped_list)):
                                     if i%2 != 0:
                                         current_coords_list.append(float(grouped_list[i]))
-                            if current_coords_list not in additional_waypoints:
-                                additional_waypoints.append(current_coords_list)
+                            additional_waypoints.append(current_coords_list)
                             additional_waypoint_counter += 1
         return true_waypoints
     
