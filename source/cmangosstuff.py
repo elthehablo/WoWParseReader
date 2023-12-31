@@ -51,7 +51,7 @@ class CManGOS:
         keys = list(dict_list_to_inspect.keys())
         
         for i in range(len(dict_list_to_inspect[keys[0]])):
-            print_line = f"({dict_list_to_inspect['entry'][i]}, {item}, 0, {dict_list_to_inspect['ChanceOrQuestChance'][i]}, 0, 1, 0, 1, 1, '{dict_list_to_inspect['LootId'][i]} - {item_name}')"
+            print_line = f"({dict_list_to_inspect['creature_entry'][i]}, {item}, 0, {dict_list_to_inspect['ChanceOrQuestChance'][i]}, 0, 1, 0, 1, 1, '{dict_list_to_inspect['name'][i]} - {item_name}')"
             print_line = f"{print_line};" if i == len(dict_list_to_inspect[keys[0]]) - 1 else f"{print_line},"
             print(print_line)
             f.write(f"{print_line}\n")
