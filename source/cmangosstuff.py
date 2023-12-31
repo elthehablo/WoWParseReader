@@ -36,6 +36,26 @@ class CManGOS:
         return dict_list
     
     @staticmethod
+    def collect_and_delete_heroic_entries(dict_list_to_inspect):
+        valid_creature_entry_dict = {
+            'entry': [],
+            'item': [],
+            'ChanceOrQuestChance': [],
+            'creature_entry': [],
+            'name': [],
+            'LootId': []
+        }
+        for i in range(len(dict_list_to_inspect['creature_entry'])):
+            if "(1)" not in dict_list_to_inspect['name'][i]:
+                valid_creature_entry_dict['entry'].append(dict_list_to_inspect['entry'][i])
+                valid_creature_entry_dict['item'].append(dict_list_to_inspect['item'][i])
+                valid_creature_entry_dict['ChanceOrQuestChance'].append(dict_list_to_inspect['ChanceOrQuestChance'][i])
+                valid_creature_entry_dict['creature_entry'].append(dict_list_to_inspect['creature_entry'][i])
+                valid_creature_entry_dict['name'].append(dict_list_to_inspect['name'][i])
+        return valid_creature_entry_dict
+                
+    
+    @staticmethod
     def dict_list_to_ref_loot_insert(dict_list_to_inspect, name_to_give: str, item: int, item_name: str):
         f = open(f"{name_to_give}.sql", "w")
         entries = dict_list_to_inspect.get("creature_entry", [0])

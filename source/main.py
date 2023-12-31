@@ -48,6 +48,9 @@ def main():
                         return
                 case "cmangostabletoinsert":
                         table_of_data = CManGOS.parse_cmangos_loot_to_list_dict(imported.filecontents)
+                        delete_heroics = True if input("Delete heroic entries? [y/n]") == "y" else False
+                        if delete_heroics:
+                                table_of_data = CManGOS.collect_and_delete_heroic_entries(table_of_data)
                         item_name = input(f"Name of item corresponding to id {npc_entry}: ")
                         CManGOS.dict_list_to_ref_loot_insert(table_of_data, item_name, npc_entry, item_name)
                         return
